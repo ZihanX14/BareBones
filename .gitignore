@@ -1,6 +1,6 @@
 # Ignore build and output folders
 build-*
-cross/
+source/
 *.o
 *.a
 *.elf
