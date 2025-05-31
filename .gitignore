@@ -1,0 +1,16 @@
+# Ignore build and output folders
+build-*
+cross/
+*.o
+*.a
+*.elf
+*.iso
+*.bin
+*.img
+
+# Ignore GCC/Binutils build artifacts
+*.tar.gz
+*.tar.xz
+*.tgz
+*.log
+*.swp
