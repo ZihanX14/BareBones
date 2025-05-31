@@ -7,3 +7,14 @@ https://wiki.osdev.org/Bare_Bones
     The C programming language (or optionally C++) to write the high level parts of your kernel.  
     The GRUB bootloader to bootload your kernel using the Multiboot boot protocol that loads us into 32-bit protected mode with paging disabled.  
     The ELF as the executable format that gives us control of where and how the kernel is loaded.  
+
+GCC Cross-compiler:  
+a cross-compiler is a compiler that runs on platform A (the host), but generates executables for platform B (the target).
+
+gcc-14.3.0
+gdb-16.3
+binutils-2.44
+
+export PREFIX="$HOME/opt/cross"  
+export TARGET=i686-elf  
+export PATH="$PREFIX/bin:$PATH"  
