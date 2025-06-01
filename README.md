@@ -17,4 +17,8 @@ binutils-2.44
 
 export PREFIX="$HOME/opt/cross"  
 export TARGET=i686-elf  
-export PATH="$PREFIX/bin:$PATH"  
+export PATH="$PREFIX/bin:$PATH"
+
+Multiboot Standard
+
+assemble boot.s with i686-elf-as boot.s -o boot.o
