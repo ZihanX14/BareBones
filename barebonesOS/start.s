@@ -34,6 +34,7 @@ doesn't make sense to return from this function as the bootloader is gone.
 .global _start
 .type _start, @function
 _start:
+
 	/*
 	The bootloader has loaded us into 32-bit protected mode on a x86
 	machine. Interrupts are disabled. Paging is disabled. The processor
@@ -46,7 +47,7 @@ _start:
 	itself. It has absolute and complete power over the
 	machine.
 	*/
-
+	cli
 	/*
 	To set up a stack, we set the esp register to point to the top of the
 	stack (as it grows downwards on x86 systems). This is necessarily done
@@ -65,6 +66,7 @@ _start:
 	runtime support to work as well.
 	*/
 
+
 	/*
 	Enter the high-level kernel. The ABI requires the stack is 16-byte
 	aligned at the time of the call instruction (which afterwards pushes
@@ -73,6 +75,7 @@ _start:
 	stack since (pushed 0 bytes so far), so the alignment has thus been
 	preserved and the call is well defined.
 	*/
+
 	call kernel_main
 
 	/*
@@ -87,6 +90,7 @@ _start:
 	3) Jump to the hlt instruction if it ever wakes up due to a
 	   non-maskable interrupt occurring or due to system management mode.
 	*/
+
 	cli
 1:	hlt
 	jmp 1b

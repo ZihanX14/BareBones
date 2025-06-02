@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <gdt.h>
 
 /* macro to check if compiler thinks the target is the wrong os*/
 #if defined(__linux__)
@@ -52,13 +53,17 @@ size_t strlen(const char* str){
     return len;
 }
 
+/* standard VGA hardware text mode, the screen resolution is 80col x 25row*/
 #define VGA_WIDTH   80
 #define VGA_HEIGHT  25
+
+/* write to a 2D buffer mapped at memory address 0xB8000*/
 #define VGA_MEMORY  0xB8000 
 
 size_t terminal_row;
 size_t terminal_column;
 uint8_t terminal_color;
+// uint8_t terminal_color_even;
 uint16_t* terminal_buffer = (uint16_t*)VGA_MEMORY;
 
 void terminal_initialize(void) 
@@ -66,11 +71,17 @@ void terminal_initialize(void)
 	terminal_row = 0;
 	terminal_column = 0;
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+	// terminal_color_even = vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_WHITE);
 	
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
 			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = vga_entry(' ', terminal_color);
+			// if (x%2==0){
+			// 	terminal_buffer[index] = vga_entry(' ', terminal_color_even);
+			// }
+			// else {
+				terminal_buffer[index] = vga_entry(' ', terminal_color);
+			// }
 		}
 	}
 }
@@ -84,6 +95,22 @@ void terminal_setcolor(uint8_t color)
 void terminal_newline(){
 	terminal_row += 1;
 	terminal_column = 0;
+}
+
+/* when cursor reaches the bottom of the screen, move up by one row and clear last row*/
+void terminal_scroll(){
+	/* Move row up one */
+	for (size_t y = 1; y < VGA_HEIGHT; y++){
+		for (size_t x = 0; x < VGA_WIDTH; x++){
+			terminal_buffer[(y - 1) * VGA_WIDTH + x] = terminal_buffer[y * VGA_WIDTH + x];
+		}
+	}
+	/* clear last row */
+	for (size_t x = 0; x < VGA_WIDTH; x++){
+		terminal_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', terminal_color);
+	}
+
+	terminal_row = VGA_HEIGHT - 1;
 }
 
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) 
@@ -101,17 +128,21 @@ void terminal_putchar(char c)
 		terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
 		if (++terminal_column == VGA_WIDTH) {
 			terminal_column = 0;
-			if (++terminal_row == VGA_HEIGHT)
-				terminal_row = 0;
+			terminal_row += 1;
 		}
 	}
-	
+
+	if (terminal_row == VGA_HEIGHT)
+		//terminal_row = 0;
+		terminal_scroll();
+
 }
 
 void terminal_write(const char* data, size_t size) 
 {
-	for (size_t i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++){
 		terminal_putchar(data[i]);
+	}
 }
 
 void terminal_writestring(const char* data) 
@@ -121,9 +152,11 @@ void terminal_writestring(const char* data)
 
 void kernel_main(void) 
 {
+	gdt_init();
+	
 	/* Initialize terminal interface */
 	terminal_initialize();
 
 	/* Newline support is left as an exercise. */
-	terminal_writestring("Hello!\nkernel World!\n");
+	terminal_writestring("H\ne\nl\nl\no\n!\nk\ne\nr\nn\ne\nl\n \nW\no\nr\nl\nd\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!!\n");
 }

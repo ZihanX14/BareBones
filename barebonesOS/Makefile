@@ -1,47 +1,63 @@
 #
-# make: build kernel.o myos.bin, copy to isodir/boot/myos.bin, build myos.iso
-# make clean: remove kernel.o myos.bin myos.iso
-# make run: run qemu-system-i386 -cdrom myos.iso
+# make: build kernel and GDT, link to myos.bin, copy to isodir, build ISO
+# make clean: remove build artifacts
+# make run: boot in QEMU
 #
 
 # Cross compiler
 CC = i686-elf-gcc
+AS = i686-elf-as
 
 # Compilation and Linking flags
 CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib
+LDFLAGS = -T linker.ld -nostdlib
+
+# Sources
+C_SOURCES = kernel.c gdt.c
+ASM_SOURCES = start.s gdt_flush.s
+
+# Object files
+OBJS = $(C_SOURCES:.c=.o) $(ASM_SOURCES:.s=.o)
 
 # Targets and file paths
-KERNEL = kernel.o
-BOOT = boot.o
 BIN = myos.bin
 ISO = myos.iso
 ISO_DIR = isodir
+GDT = gdt.o gdt_flush.o
 GRUB_CFG = $(ISO_DIR)/boot/grub/grub.cfg
 
-# Default target to build everything for myos.iso
+# Default target to build everything
 all: $(ISO)
 
-# Compile kernel: i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-$(KERNEL): kernel.c
+# Compile C source files
+%.o: %.c
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-# Link object files into kernel binary: i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
-$(BIN): $(BOOT) $(KERNEL)
+# Assemble assembly source files
+%.o: %.s
+	$(AS) $< -o $@
+
+gdt_flush.o: gdt_flush.s
+	$(CC) -c $< -o $@
+gdt.o: gdt.c gdt.h
+	$(CC) -c $< -o $@ $(CFLAGS)
+
+# Link object files into kernel binary
+$(BIN): $(BOOT) $(KERNEL) $(GDT)
 	$(CC) $(LDFLAGS) -o $@ $^ -lgcc
 
-#Copy binary into ISO folder: cp myos.bin isodir/boot/myos.bin
+# Copy kernel binary into ISO directory
 $(ISO_DIR)/boot/$(BIN): $(BIN)
 	cp $< $@
 
-# Build bootable iso: grub-mkrescue -o myos.iso isodir
+# Build bootable ISO image using GRUB
 $(ISO): $(ISO_DIR)/boot/$(BIN) $(GRUB_CFG)
 	grub-mkrescue -o $@ $(ISO_DIR)
 
-# Cleanup
+# Clean up build artifacts
 clean:
-	rm -f $(BIN) $(KERNEL) $(ISO) $(ISO_DIR)/boot/$(BIN)
+	rm -f $(BIN) $(OBJS) $(ISO) $(ISO_DIR)/boot/$(BIN)
 
-# Run (Optional)
+# Run in QEMU
 run: all
 	qemu-system-i386 -cdrom $(ISO)
