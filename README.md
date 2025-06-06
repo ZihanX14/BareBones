@@ -23,6 +23,7 @@ Multiboot Standard
 
 assemble boot.s with i686-elf-as boot.s -o boot.o
 
+i686-elf-gcc -std=gnu99 -ffreestanding -g -c start.s -o start.o
 i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
 cp myos.bin isodir/boot/myos.bin

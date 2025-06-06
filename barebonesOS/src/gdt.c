@@ -12,17 +12,13 @@ struct gdt_ptr {
 
 static struct gdt_ptr gp;
 
-struct GDT {
-    uint32_t base;
-    uint32_t limit;
-    uint8_t access_byte;
-    uint8_t flags;
-};
-
 void encode_gdt_entry(uint8_t *target, struct GDT source)
 {
     // Check the limit to make sure that it can be encoded
-    if (source.limit > 0xFFFFF) {kerror("GDT cannot encode limits larger than 0xFFFFF");}
+    if (source.limit > 0xFFFFF) {
+        //kerror("GDT cannot encode limits larger than 0xFFFFF");
+        while(1);
+    }
     
     // Encode the limit
     target[0] = source.limit & 0xFF;

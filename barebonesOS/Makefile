@@ -1,62 +1,70 @@
 #
-# make: build kernel and GDT, link to myos.bin, copy to isodir, build ISO
-# make clean: remove build artifacts
-# make run: boot in QEMU
+# Make: Build kernel, link to myos.bin, copy to isodir, and create ISO
+# Clean: Remove all build artifacts
+# Run: Boot ISO in QEMU
 #
 
-# Cross compiler
-CC = i686-elf-gcc
-AS = i686-elf-as
+# Directories
+SRC_DIR := src
+INC_DIR := include
+BUILD_DIR := build
+ISO_DIR := isodir
+BOOT_DIR := $(ISO_DIR)/boot
 
-# Compilation and Linking flags
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-LDFLAGS = -T linker.ld -nostdlib
+# Tools
+CC := i686-elf-gcc
+AS := i686-elf-as
+LD := i686-elf-gcc
+
+# Flags
+CFLAGS := -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I$(INC_DIR)
+LDFLAGS := -T linker.ld -nostdlib
 
 # Sources
-C_SOURCES = kernel.c gdt.c
-ASM_SOURCES = start.s gdt_flush.s
+C_SOURCES := kernel.c gdt.c idt.c pic.c clockinit.c clock_handler.c keyboardinit.c keyboard_handler.c
+ASM_SOURCES := start.s gdt_flush.s idt_flush.s clock.s keyboard.s
+# To enable clock interrupt later:
+# ASM_SOURCES += clock.s
 
-# Object files
-OBJS = $(C_SOURCES:.c=.o) $(ASM_SOURCES:.s=.o)
+# Object file list
+C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SOURCES:.c=.o))
+ASM_OBJS := $(addprefix $(BUILD_DIR)/, $(ASM_SOURCES:.s=.o))
+OBJS := $(C_OBJS) $(ASM_OBJS)
 
-# Targets and file paths
-BIN = myos.bin
-ISO = myos.iso
-ISO_DIR = isodir
-GDT = gdt.o gdt_flush.o
-GRUB_CFG = $(ISO_DIR)/boot/grub/grub.cfg
+# Output files
+BIN := myos.bin
+ISO := myos.iso
+GRUB_CFG := $(ISO_DIR)/boot/grub/grub.cfg
 
-# Default target to build everything
+# Default target
 all: $(ISO)
 
-# Compile C source files
-%.o: %.c
+# Compile C files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	mkdir -p $(BUILD_DIR)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-# Assemble assembly source files
-%.o: %.s
+# Assemble .s files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.s
+	mkdir -p $(BUILD_DIR)
 	$(AS) $< -o $@
 
-gdt_flush.o: gdt_flush.s
-	$(CC) -c $< -o $@
-gdt.o: gdt.c gdt.h
-	$(CC) -c $< -o $@ $(CFLAGS)
+# Link kernel binary
+$(BIN): $(OBJS)
+	$(LD) $(LDFLAGS) -o $@ $^
 
-# Link object files into kernel binary
-$(BIN): $(BOOT) $(KERNEL) $(GDT)
-	$(CC) $(LDFLAGS) -o $@ $^ -lgcc
-
-# Copy kernel binary into ISO directory
-$(ISO_DIR)/boot/$(BIN): $(BIN)
+# Copy to ISO dir
+$(BOOT_DIR)/$(BIN): $(BIN)
+	mkdir -p $(BOOT_DIR)
 	cp $< $@
 
-# Build bootable ISO image using GRUB
-$(ISO): $(ISO_DIR)/boot/$(BIN) $(GRUB_CFG)
+# Build bootable ISO
+$(ISO): $(BOOT_DIR)/$(BIN) $(GRUB_CFG)
 	grub-mkrescue -o $@ $(ISO_DIR)
 
-# Clean up build artifacts
+# Clean up
 clean:
-	rm -f $(BIN) $(OBJS) $(ISO) $(ISO_DIR)/boot/$(BIN)
+	rm -rf $(BUILD_DIR) $(BIN) $(ISO) $(BOOT_DIR)/$(BIN)
 
 # Run in QEMU
 run: all

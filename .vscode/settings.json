@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "ranges": "c",
+        "os.h": "c"
+    }
+}

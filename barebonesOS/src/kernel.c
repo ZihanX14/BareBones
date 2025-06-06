@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <gdt.h>
+#include <os.h>
 
 /* macro to check if compiler thinks the target is the wrong os*/
 #if defined(__linux__)
@@ -153,10 +153,16 @@ void terminal_writestring(const char* data)
 void kernel_main(void) 
 {
 	gdt_init();
-	
+	idt_init();
+
 	/* Initialize terminal interface */
 	terminal_initialize();
+	terminal_writestring("Starts Clock\n");
+
+	clock_init();
+	keyboard_init();
+	asm volatile ("sti"); // enable interrupts
 
 	/* Newline support is left as an exercise. */
-	terminal_writestring("H\ne\nl\nl\no\n!\nk\ne\nr\nn\ne\nl\n \nW\no\nr\nl\nd\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!!\n");
+	//terminal_writestring("H\ne\nl\nl\no\n!\nk\ne\nr\nn\ne\nl\n \nW\no\nr\nl\nd\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!\n!!\n");
 }

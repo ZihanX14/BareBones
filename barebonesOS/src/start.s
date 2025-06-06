@@ -91,7 +91,7 @@ _start:
 	   non-maskable interrupt occurring or due to system management mode.
 	*/
 
-	cli
+	/* cli : disable interrupt for infinite loop*/
 1:	hlt
 	jmp 1b
 
