@@ -1,4 +1,4 @@
-#include <os.h>
+#include <xos.h>
 
 /**
  *  Make space for the interrupt descriptor table
@@ -13,7 +13,7 @@ void clock_init(){
     pic_remap();
 
     // Register clock interrupt handler (IRQ0 = vector 32)
-    idt_set_gate(32, uint32 clock_isr, 0x08, 0x8E);
+    idt_set_gate(32, (uint32) clock_isr, 0x08, 0x8E);
 
     // Initialize PIT to 100Hz
     uint32 divisor = 1193180 / 100; // ~100Hz

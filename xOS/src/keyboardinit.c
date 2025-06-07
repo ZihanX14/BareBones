@@ -1,7 +1,5 @@
 /* keyboardinit.c - keyboard_init */
-#include <os.h>
-
-extern void keyboard_isr(void);
+#include <xos.h>
 
 /**
  *  Make space for the interrupt descriptor table
@@ -13,7 +11,7 @@ extern void keyboard_isr(void);
  */
 
  enum scancode {
-    NULL = 0x00,
+    NONE = 0x00,
     ESCAPE_PRESSED = 0x01,
     ONE_PRESSED = 0x02,
     TWO_PRESSED = 0x03,
@@ -93,6 +91,7 @@ static char* _qwertzuiop = "qwertzuiop"; // 0x10-0x1c
 static char* _asdfghjkl = "asdfghjkl";
 static char* _yxcvbnm = "yxcvbnm";
 static char* _num = "123456789";
+
 uint8 keyboard_to_ascii(uint8 key){
 	//kprintf("key=0x%x\n", key);
 	if(key == 0x1C) return '\n';

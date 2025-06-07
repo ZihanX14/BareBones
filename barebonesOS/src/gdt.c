@@ -1,9 +1,8 @@
 /* gdt.c - encode_gdt_entry, gdt_init*/
 
-#include <stdint.h>
-#include <gdt.h>
+#include <os.h>
 
-static uint8_t gdt[5 * 8]; // 5 entries, 8 bytes each
+static uint8 gdt[5 * 8]; // 5 entries, 8 bytes each
 
 struct gdt_ptr {
     uint16_t limit;
@@ -12,8 +11,7 @@ struct gdt_ptr {
 
 static struct gdt_ptr gp;
 
-void encode_gdt_entry(uint8_t *target, struct GDT source)
-{
+void encode_gdt_entry(uint8 *target, struct GDT source){
     // Check the limit to make sure that it can be encoded
     if (source.limit > 0xFFFFF) {
         //kerror("GDT cannot encode limits larger than 0xFFFFF");

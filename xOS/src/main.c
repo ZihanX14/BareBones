@@ -1,4 +1,4 @@
-#include <os.h>
+#include <xos.h>
 
 void main(void) 
 {

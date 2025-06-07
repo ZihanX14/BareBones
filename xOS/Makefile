@@ -21,7 +21,7 @@ CFLAGS := -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I$(INC_DIR)
 LDFLAGS := -T linker.ld -nostdlib
 
 # Sources
-C_SOURCES := main.c kernel.c gdt.c idt.c pic.c clockinit.c clock_handler.c keyboardinit.c keyboard_handler.c
+C_SOURCES := main.c terminal.c gdt.c idt.c pic.c clockinit.c clock_handler.c keyboardinit.c keyboard_handler.c
 ASM_SOURCES := start.s gdt_flush.s idt_flush.s clock.s keyboard.s
 # To enable clock interrupt later:
 # ASM_SOURCES += clock.s

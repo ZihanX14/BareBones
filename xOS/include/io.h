@@ -1,5 +1,4 @@
 /* Write a byte to an I/O port */
-#include <kernel.h>
 static inline void outb(uint16 port, uint8 val) {
     asm volatile ( "outb %0, %1" :: "a"(val), "Nd"(port) );
 }

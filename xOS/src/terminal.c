@@ -1,4 +1,4 @@
-/* kernel.c */
+/* terminal.c */
 /**
  * uses VGA text mode buffer at 0xB8000 as output device
  * sets up a driver that remembers location of next character in the buffer
@@ -7,7 +7,7 @@
  * no support for scrolling when screen is filled up
  * compile with i686-elf-gcc -c kernel.c -o kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
  */
-#include <os.h>
+#include <xos.h>
 
 /* macro to check if compiler thinks the target is the wrong os*/
 #if defined(__linux__)
@@ -38,12 +38,12 @@ static inline uint8 vga_entry_color(enum vga_color fg, enum vga_color bg){
     return fg | bg << 4; //shift bg into high nibble (bit 4-7) and combine into 1 byte
 }
 
-static inline uint16_t vga_entry(unsigned char uc, uint8 color){
-    return (uint16_t) uc | (uint16_t) color << 8;
+static inline uint16 vga_entry(unsigned char uc, uint8 color){
+    return (uint16) uc | (uint16) color << 8;
 }
 
-size_t strlen(const char* str){
-    size_t len = 0;
+size strlen(const char* str){
+    size len = 0;
     while (str[len]){
         len++;
     }
@@ -57,11 +57,11 @@ size_t strlen(const char* str){
 /* write to a 2D buffer mapped at memory address 0xB8000*/
 #define VGA_MEMORY  0xB8000 
 
-size_t terminal_row;
-size_t terminal_column;
-uint8_t terminal_color;
-// uint8_t terminal_color_even;
-uint16_t* terminal_buffer = (uint16_t*)VGA_MEMORY;
+size terminal_row;
+size terminal_column;
+uint8 terminal_color;
+// uint8 terminal_color_even;
+uint16* terminal_buffer = (uint16*)VGA_MEMORY;
 
 void terminal_initialize(void) 
 {
@@ -70,9 +70,9 @@ void terminal_initialize(void)
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	// terminal_color_even = vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_WHITE);
 	
-	for (size_t y = 0; y < VGA_HEIGHT; y++) {
-		for (size_t x = 0; x < VGA_WIDTH; x++) {
-			const size_t index = y * VGA_WIDTH + x;
+	for (size y = 0; y < VGA_HEIGHT; y++) {
+		for (size x = 0; x < VGA_WIDTH; x++) {
+			const size index = y * VGA_WIDTH + x;
 			// if (x%2==0){
 			// 	terminal_buffer[index] = vga_entry(' ', terminal_color_even);
 			// }
@@ -83,7 +83,7 @@ void terminal_initialize(void)
 	}
 }
 
-void terminal_setcolor(uint8_t color) 
+void terminal_setcolor(uint8 color) 
 {
 	terminal_color = color;
 }
@@ -97,22 +97,22 @@ void terminal_newline(){
 /* when cursor reaches the bottom of the screen, move up by one row and clear last row*/
 void terminal_scroll(){
 	/* Move row up one */
-	for (size_t y = 1; y < VGA_HEIGHT; y++){
-		for (size_t x = 0; x < VGA_WIDTH; x++){
+	for (size y = 1; y < VGA_HEIGHT; y++){
+		for (size x = 0; x < VGA_WIDTH; x++){
 			terminal_buffer[(y - 1) * VGA_WIDTH + x] = terminal_buffer[y * VGA_WIDTH + x];
 		}
 	}
 	/* clear last row */
-	for (size_t x = 0; x < VGA_WIDTH; x++){
+	for (size x = 0; x < VGA_WIDTH; x++){
 		terminal_buffer[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', terminal_color);
 	}
 
 	terminal_row = VGA_HEIGHT - 1;
 }
 
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) 
+void terminal_putentryat(char c, uint8 color, size x, size y) 
 {
-	const size_t index = y * VGA_WIDTH + x;
+	const size index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
 }
 
@@ -135,9 +135,9 @@ void terminal_putchar(char c)
 
 }
 
-void terminal_write(const char* data, size_t size) 
+void terminal_write(const char* data, size size) 
 {
-	for (size_t i = 0; i < size; i++){
+	for (uint32 i = 0; i < size; i++){
 		terminal_putchar(data[i]);
 	}
 }

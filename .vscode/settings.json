@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "ranges": "c",
-        "os.h": "c"
+        "os.h": "c",
+        "cstdint": "c",
+        "idt.h": "c",
+        "executor": "cpp",
+        "chrono": "cpp",
+        "functional": "cpp",
+        "xos.h": "c",
+        "*.in": "c"
     }
 }

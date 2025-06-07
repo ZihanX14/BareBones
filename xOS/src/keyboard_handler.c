@@ -12,20 +12,19 @@
  * 
  *  Make space for the interrupt descriptor table
     Tell the CPU where that space is (see GDT Tutorial: lidt works the very same way as lgdt)
-    Tell the PIC that you no longer want to use the BIOS defaults (see Programming the PIC chips)
+    Tell the PIC that you no longer Qwant to use the BIOS defaults (see Programming the PIC chips)
     Write a couple of ISR handlers (see Interrupt Service Routines) for both IRQs and exceptions
     Put the addresses of the ISR handlers in the appropriate descriptors (in Interrupt Descriptor Table)
     Enable all supported interrupts in the IRQ mask (of the PIC)
  * 
 */
 
-#include <os.h>
+#include <xos.h>
 
-extern void toggle_output();
 
 /* TODO: create a buffer to store the input from keyboard till the user press Enter */
 void keyboard_handler() {
-   uint8_t scancode = inb(0x60);
+   uint8 scancode = inb(0x60);
    char ch = keyboard_to_ascii(scancode);
    if (ch) {
       terminal_writestring("Keyboard triggered: ");

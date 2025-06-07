@@ -1,5 +1,5 @@
 /* clock_handler.c */
-#include <os.h>
+#include <xos.h>
 
 
 static int ticks = 0;
