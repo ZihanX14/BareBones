@@ -5,7 +5,7 @@
 #
 
 # Directories
-SRC_DIR := src
+SRC_DIR = src
 INC_DIR := include
 BUILD_DIR := build
 ISO_DIR := isodir
@@ -18,17 +18,18 @@ LD := i686-elf-gcc
 
 # Flags
 CFLAGS := -std=gnu99 -ffreestanding -O2 -Wall -Wextra -I$(INC_DIR)
+CFLAGS += -fno-toplevel-reorder -fno-unit-at-a-time
 LDFLAGS := -T linker.ld -nostdlib
 
 # Sources
-C_SOURCES := main.c terminal.c gdt.c idt.c pic.c clockinit.c clock_handler.c keyboardinit.c keyboard_handler.c
-ASM_SOURCES := start.s gdt_flush.s idt_flush.s clock.s keyboard.s
+C_SOURCES := main.c terminal.c gdt.c idt.c pic.c clockinit.c clock_handler.c keyboardinit.c keyboard_handler.c meminit.c shell.c strcmp.c read.c
+ASM_SOURCES := start.S gdt_flush.S idt_flush.S clock.S keyboard.S
 # To enable clock interrupt later:
 # ASM_SOURCES += clock.s
 
 # Object file list
 C_OBJS := $(addprefix $(BUILD_DIR)/, $(C_SOURCES:.c=.o))
-ASM_OBJS := $(addprefix $(BUILD_DIR)/, $(ASM_SOURCES:.s=.o))
+ASM_OBJS := $(addprefix $(BUILD_DIR)/, $(ASM_SOURCES:.S=.o))
 OBJS := $(C_OBJS) $(ASM_OBJS)
 
 # Output files
@@ -44,8 +45,8 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(BUILD_DIR)
 	$(CC) -c $< -o $@ $(CFLAGS)
 
-# Assemble .s files
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.s
+# Assemble .S files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.S
 	mkdir -p $(BUILD_DIR)
 	$(AS) $< -o $@
 
@@ -63,6 +64,7 @@ $(ISO): $(BOOT_DIR)/$(BIN) $(GRUB_CFG)
 	grub-mkrescue -o $@ $(ISO_DIR)
 
 # Clean up
+.PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR) $(BIN) $(ISO) $(BOOT_DIR)/$(BIN)
 

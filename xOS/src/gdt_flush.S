@@ -1,3 +1,4 @@
+/* gdt_flush.c */
 .global gdt_flush
 gdt_flush:
     movl 4(%esp), %eax

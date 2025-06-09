@@ -1,3 +1,4 @@
+/* pic.c */
 #include <xos.h>
 
 void pic_remap() {
@@ -16,4 +17,6 @@ void pic_remap() {
 
     outb(0x21, 0x0);  // Unmask all IRQs on master
     outb(0xA1, 0x0);  // Unmask all IRQs on slave
+
+    //terminal_writestring("PIC remapped and unmasked.\n");
 }

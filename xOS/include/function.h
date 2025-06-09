@@ -9,6 +9,8 @@ extern void terminal_putentryat(char c, uint8 color, size x, size y);
 extern void terminal_putchar(char c);
 extern void terminal_write(const char* data, size size);
 extern void terminal_writestring(const char* data);
+extern void terminal_set_cursor (int x, int y);
+extern void itoa(uint32 value, char *str);
 
 /*gdt.c*/
 struct GDT;
@@ -48,4 +50,17 @@ extern uint8 keyboard_to_ascii(uint8 key);
 extern void keyboard_init(void);
 
 /*keyboard_handler.c*/
-extern void keyboard_handler(void); 
+extern __attribute__((used)) void keyboard_handler(void);
+
+/*meminit.c*/
+extern void mem_init(void);
+
+/*shell.c*/
+extern process shell_init(void);
+
+/*read.c*/
+extern void read_line(char *dest, int maxlen);
+
+/*LIBC*/
+/*strcmp.c*/
+extern int strcmp(const char* a, const char* b);

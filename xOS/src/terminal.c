@@ -70,6 +70,7 @@ void terminal_initialize(void)
 	terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
 	// terminal_color_even = vga_entry_color(VGA_COLOR_GREEN, VGA_COLOR_WHITE);
 	
+	
 	for (size y = 0; y < VGA_HEIGHT; y++) {
 		for (size x = 0; x < VGA_WIDTH; x++) {
 			const size index = y * VGA_WIDTH + x;
@@ -114,6 +115,7 @@ void terminal_putentryat(char c, uint8 color, size x, size y)
 {
 	const size index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
+	terminal_set_cursor (x, y);
 }
 
 void terminal_putchar(char c) 
@@ -145,4 +147,31 @@ void terminal_write(const char* data, size size)
 void terminal_writestring(const char* data) 
 {
 	terminal_write(data, strlen(data));
+}
+
+void terminal_set_cursor (int x, int y){
+	uint16 pos = y * VGA_WIDTH + x + 1;
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (uint8) (pos & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (uint8) ((pos >> 8) & 0xFF));
+} 
+
+void itoa(uint32 value, char *str) {
+    char temp[11]; // max for 32-bit int = 10 digits + null
+    int i = 0;
+    if (value == 0) {
+        str[0] = '0';
+        str[1] = '\0';
+        return;
+    }
+    while (value > 0) {
+        temp[i++] = '0' + (value % 10);
+        value /= 10;
+    }
+    // reverse string
+    for (int j = 0; j < i; j++) {
+        str[j] = temp[i - j - 1];
+    }
+    str[i] = '\0';
 }

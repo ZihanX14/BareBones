@@ -1,4 +1,5 @@
-/* Bootstrap Assembly to
+/* start.S
+ * Bootstrap Assembly to
  * Declare constants for the multiboot header (global variables) 
  * multiboot header must be very early in the kernel binary 
  */

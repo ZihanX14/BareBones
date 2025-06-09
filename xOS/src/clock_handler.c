@@ -11,19 +11,19 @@ void toggle_output(){
 }
 
 void clock_handler() {
-    if (timer_enable != 1){
-        outb(0x20, 0x20);
-        return;
-    }
-    ticks++;
-    /* print one line for each second: PIT 100Hz*/
-    if (ticks % 100 == 0) {
-        second++;
-        terminal_writestring("Second");
-        //terminal_putchar('0' + second);
-        terminal_putchar('0' + (second % 10));
-        terminal_putchar('\n');
-    }
+    // if (timer_enable != 1){
+    //     outb(0x20, 0x20);
+    //     return;
+    // }
+    // ticks++;
+    // /* print one line for each second: PIT 100Hz*/
+    // if (ticks % 100 == 0) {
+    //     second++;
+    //     terminal_writestring("Second");
+    //     //terminal_putchar('0' + second);
+    //     terminal_putchar('0' + (second % 10));
+    //     terminal_putchar('\n');
+    // }
     // terminal_writestring("Tick");
     // terminal_putchar('0' + (ticks % 100));
     // terminal_putchar('\n');

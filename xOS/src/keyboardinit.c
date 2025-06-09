@@ -117,6 +117,11 @@ uint8 keyboard_to_ascii(uint8 key){
 
 void keyboard_init() {
 
-    // Register clock interrupt handler (IRQ0 = vector 33)
+    // Register clock interrupt handler (IRQ1 = vector 33) after pic remap
     idt_set_gate(33, (uint32)keyboard_isr, 0x08, 0x8E);
+
+	// Unmask IRQ1 (keyboard) on PIC1
+    uint8 mask = inb(0x21);  // PIC1 data port
+    mask &= ~(1 << 1);       // clear bit 1 to unmask
+    outb(0x21, mask);
 }

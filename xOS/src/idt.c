@@ -1,6 +1,11 @@
+/* idt.c */
 #include <xos.h>
 
 #define IDT_ENTRIES 256
+
+/**
+ * Idt: a signal from a device that tells the CPU to handle a specific event
+ */
 
 /* IA_32 IDT entry table*/
 struct IDTEntry {
@@ -20,6 +25,7 @@ static struct IDTEntry idt[IDT_ENTRIES];
 static struct IDTPointer idtp;
 
 void idt_set_gate(uint8 num, uint32 base, uint16 sel, uint8 flags){
+    //terminal_writestring("Set IDT entry 33\n");
     idt[num].base_low = base & 0xFFFF;
     idt[num].base_high = (base >> 16) & 0xFFFF;
     idt[num].sel = sel;
@@ -40,4 +46,5 @@ void idt_init(){
     // idt_set_gate(32, (uint32_t)isr32, 0x08, 0x8E);
 
     idt_flush((uint32)&idtp);
+    //terminal_writestring("IDT loaded.\n");
 }
