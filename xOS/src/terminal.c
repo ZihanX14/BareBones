@@ -63,6 +63,8 @@ uint8 terminal_color;
 // uint8 terminal_color_even;
 uint16* terminal_buffer = (uint16*)VGA_MEMORY;
 
+
+
 void terminal_initialize(void) 
 {
 	terminal_row = 0;
@@ -111,11 +113,29 @@ void terminal_scroll(){
 	terminal_row = VGA_HEIGHT - 1;
 }
 
+void 
+
+void terminal_backspace(){
+	if (terminal_column > 0) {
+        terminal_column--;
+    } else if (terminal_row > 0) {
+        terminal_row--;
+        terminal_column = VGA_WIDTH - 1;
+    } else {
+        return; // Top-left, nothing to delete
+    }
+
+	/* delete last character */
+    size index = terminal_row * VGA_WIDTH + terminal_column;
+    terminal_buffer[index] = vga_entry(' ', terminal_color);
+    terminal_set_cursor(terminal_column, terminal_row);
+	
+}
+
 void terminal_putentryat(char c, uint8 color, size x, size y) 
 {
 	const size index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
-	terminal_set_cursor (x, y);
 }
 
 void terminal_putchar(char c) 
@@ -135,6 +155,7 @@ void terminal_putchar(char c)
 		//terminal_row = 0;
 		terminal_scroll();
 
+	terminal_set_cursor (terminal_column, terminal_row);
 }
 
 void terminal_write(const char* data, size size) 
@@ -150,7 +171,7 @@ void terminal_writestring(const char* data)
 }
 
 void terminal_set_cursor (int x, int y){
-	uint16 pos = y * VGA_WIDTH + x + 1;
+	uint16 pos = y * VGA_WIDTH + x;
 	outb(0x3D4, 0x0F);
 	outb(0x3D5, (uint8) (pos & 0xFF));
 	outb(0x3D4, 0x0E);

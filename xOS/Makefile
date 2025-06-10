@@ -22,7 +22,7 @@ CFLAGS += -fno-toplevel-reorder -fno-unit-at-a-time
 LDFLAGS := -T linker.ld -nostdlib
 
 # Sources
-C_SOURCES := main.c terminal.c gdt.c idt.c pic.c clockinit.c clock_handler.c keyboardinit.c keyboard_handler.c meminit.c shell.c strcmp.c read.c
+C_SOURCES := main.c terminal.c gdt.c idt.c pic.c clockinit.c clock_handler.c keyboardinit.c keyboard_handler.c meminit.c shell.c strcmp.c read.c strcpy.c
 ASM_SOURCES := start.S gdt_flush.S idt_flush.S clock.S keyboard.S
 # To enable clock interrupt later:
 # ASM_SOURCES += clock.s
@@ -33,8 +33,8 @@ ASM_OBJS := $(addprefix $(BUILD_DIR)/, $(ASM_SOURCES:.S=.o))
 OBJS := $(C_OBJS) $(ASM_OBJS)
 
 # Output files
-BIN := myos.bin
-ISO := myos.iso
+BIN := xos.bin
+ISO := xos.iso
 GRUB_CFG := $(ISO_DIR)/boot/grub/grub.cfg
 
 # Default target

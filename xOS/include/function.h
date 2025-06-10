@@ -5,11 +5,13 @@ extern void terminal_initialize(void);
 extern void terminal_setcolor(uint8 color);
 extern void terminal_newline(void);
 extern void terminal_scroll(void);
+extern void terminal_backspace(void);
 extern void terminal_putentryat(char c, uint8 color, size x, size y);
 extern void terminal_putchar(char c);
 extern void terminal_write(const char* data, size size);
 extern void terminal_writestring(const char* data);
 extern void terminal_set_cursor (int x, int y);
+extern size strlen(const char* str);
 extern void itoa(uint32 value, char *str);
 
 /*gdt.c*/
@@ -64,3 +66,6 @@ extern void read_line(char *dest, int maxlen);
 /*LIBC*/
 /*strcmp.c*/
 extern int strcmp(const char* a, const char* b);
+
+/*strcpy.c*/
+extern int	strcpy(char	*tar, char *src);
